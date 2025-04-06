@@ -1,0 +1,27 @@
+-------------- Data Quality Report for movies ---------------
+
+Schema:
+root
+ |-- id: string (nullable = true)
+ |-- title: string (nullable = true)
+ |-- release_date: string (nullable = true)
+ |-- budget: string (nullable = true)
+ |-- revenue: double (nullable = true)
+
+-------------- Null Check for movies ---------------
+      Column  Null Counts
+          id            0
+       title            6
+release_date           90
+      budget         4432
+     revenue            6
+Duplicate Rows: 0
+Total Rows: 45436
+Total Columns: 5
+
+Sample Data:
+Row(id='100', title='Lock, Stock and Two Smoking Barrels', release_date='03/05/1998', budget='1350000', revenue=3897569.0)
+Row(id='10000', title='La estrategia del caracol', release_date='1993-12-25', budget='0', revenue=0.0)
+Row(id='10001', title='Young Einstein', release_date='1988-12-15', budget='0', revenue=0.0)
+Row(id='100010', title='Flight Command', release_date='12/27/1940', budget='0', revenue=0.0)
+Row(id='10003', title='The Saint', release_date='04/03/1997', budget='0', revenue=118063304.0)

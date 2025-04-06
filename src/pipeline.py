@@ -1,22 +1,37 @@
 from pyspark.sql import SparkSession
 from extract import DataExtractor
 from data_quality import DataQuality
+from transform_bronze import MovieBronzeLayer, MovieExtendedBronzeLayer, RatingsBronzeLayer
 
 
 def run_pipeline():
+    #This is the main function that runs the ETL pipeline.
+
+    #Initialization
     spark = SparkSession.builder.appName("Movie_Analytics_ETL").getOrCreate()
 
-    extractor = DataExtractor(spark)
+    #Extract
+    Extractor = DataExtractor(spark)
+    sourceDataframes = Extractor.get_all_dataframes()
 
-    # Extract data from the source
-    df_movies = extractor.extract_data("../project_data/movies_main.csv", "csv", header=True, inferSchema=True)
-    df_extended = extractor.extract_data("../project_data/movie_extended.csv", "csv", header=True, inferSchema=True)
-    df_ratings = extractor.extract_data("../project_data/ratings.json", "json")
+    # #Data Quality Check of Source Dataframes
+    # for key in sourceDataframes.keys():
+    #     DataQuality(sourceDataframes[key], key)
 
-    dq_df_movies = DataQuality(df_movies)
-    dq_df_movies.schema()
-    df_movies.show(5)
-    
+    test1 = MovieBronzeLayer(sourceDataframes['movies'], 'movies')
+    test1.test_transform_df()
+
+    # #Transformation to Bronze Layer
+    # for key in sourceDataframes.keys():
+    #     if key.lower() == "movies":
+    #         MovieBronzeLayer(sourceDataframes[key], key)
+    #     elif key.lower() == "extended":
+    #         MovieExtendedBronzeLayer(sourceDataframes[key], key)
+    #     elif key.lower() == "ratings":
+    #         RatingsBronzeLayer(sourceDataframes[key], key)
+    #     else:
+    #         raise ValueError(f"No BronzeLayer defined for source: {key}")
+
     spark.stop()
 
 
