@@ -2,7 +2,7 @@ from pyspark.sql import SparkSession
 from extract import DataExtractor
 from data_quality import DataQuality
 from transform_bronze import MovieBronzeLayer, MovieExtendedBronzeLayer, RatingsBronzeLayer
-#from transform_silver import MovieSilverLayer, MovieExtendedSilverLayer, RatingsSilverLayer
+from transform_silver import SilverLayer
 
 def run_pipeline():
     '''
@@ -20,15 +20,17 @@ def run_pipeline():
     # for key in sourceDataframes.keys():
     #     DataQuality(sourceDataframes[key], key)
 
-    # bronzeMovieDf = MovieBronzeLayer(sourceDataframes['movies'], 'movies')
-    # bronzeMovieDf.transform_df()
+    bronzeMovieDf = MovieBronzeLayer(sourceDataframes['movies'], 'movies')
+    bronzeMovieDf.transform_df()
 
-    # bronzeMovieExtendedDf = MovieExtendedBronzeLayer(sourceDataframes['extended'], 'extended')
-    # bronzeMovieExtendedDf.transform_df()
+    bronzeMovieExtendedDf = MovieExtendedBronzeLayer(sourceDataframes['extended'], 'extended')
+    bronzeMovieExtendedDf.transform_df()
 
     bronzeRatingsDF = RatingsBronzeLayer(sourceDataframes['ratings'], 'ratings')
     bronzeRatingsDF.transform_df()
 
+    SilverLayer(bronzeMovieDf.bronzeMovieDF, bronzeMovieExtendedDf.bronzeMovieExtendedDf, bronzeRatingsDF.bronzeRatingsDF).fact_movies()
+    
     #Silver Layer
     # bronzeMovieDf = MovieBronzeLayer(sourceDataframes['movies'], 'movies')
     # bronzeMovieDf.transform_df()

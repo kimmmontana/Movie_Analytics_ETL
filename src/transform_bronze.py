@@ -11,13 +11,14 @@ class BronzeLayer:
 class MovieBronzeLayer(BronzeLayer):
     def __init__(self, df: DataFrame, name: str):
         super().__init__(df, name)
-    
+        self.bronzeMovieDF = None
+
     def transform_df(self):
         """
         This method applies the transformations to the DataFrame.
         """
         # Call the data quality check before transformation
-        DataQuality(self.df, self.name).data_quality()
+        #DataQuality(self.df, self.name).data_quality()
 
         self.row_based_transformation()
         self.transform_id()
@@ -26,9 +27,10 @@ class MovieBronzeLayer(BronzeLayer):
         self.transform_budget()
         self.transform_revenue()
 
+        self.bronzeMovieDF = self.df
         # Call the data quality check after transformation
         print("After Process:")
-        DataQuality(self.df, self.name).data_quality()
+        #DataQuality(self.df, self.name).data_quality()
         pass 
 
     def test_transform_df(self):
@@ -210,12 +212,13 @@ class MovieBronzeLayer(BronzeLayer):
 class MovieExtendedBronzeLayer(BronzeLayer):
     def __init__(self, df: DataFrame, name: str):
         super().__init__(df, name)
-    
+        self.bronzeMovieExtendedDf = None
+
     def transform_df(self):
         """
         This method applies the transformations to the DataFrame.
         """
-        DataQuality(self.df, self.name).data_quality()
+        #DataQuality(self.df, self.name).data_quality()
 
         #Call the transformation methods in the order they should be applied
         self.row_based_transformation()
@@ -225,9 +228,10 @@ class MovieExtendedBronzeLayer(BronzeLayer):
         self.transform_production_countries()
         self.transform_spoken_languages()
 
+        self.bronzeMovieExtendedDf = self.df
 
         print("After Process:")
-        DataQuality(self.df, self.name).data_quality()
+        #DataQuality(self.df, self.name).data_quality()
 
     def row_based_transformation(self):
         """
@@ -340,6 +344,7 @@ class MovieExtendedBronzeLayer(BronzeLayer):
 class RatingsBronzeLayer(BronzeLayer):
     def __init__(self, df: DataFrame, name: str):
         super().__init__(df, name)
+        self.bronzeRatingsDF = None
         pass
 
     def transform_df(self):
@@ -347,7 +352,7 @@ class RatingsBronzeLayer(BronzeLayer):
         This method applies the transformations to the DataFrame.
         """
         # Call the data quality check before transformation
-        DataQuality(self.df, self.name).data_quality()
+        #DataQuality(self.df, self.name).data_quality()
 
         # Call the transformation methods in the order they should be applied
         self.transform_id()
@@ -356,9 +361,10 @@ class RatingsBronzeLayer(BronzeLayer):
         self.transform_total_std_dev()
         self.transform_last_rated()
 
+        self.bronzeRatingsDF = self.df
         # Call the data quality check after transformation
-        print("After Process:") 
-        DataQuality(self.df, self.name).data_quality()
+        #print("After Process:") 
+        #DataQuality(self.df, self.name).data_quality()
 
     def transform_id(self):
         """
@@ -411,6 +417,5 @@ class RatingsBronzeLayer(BronzeLayer):
 
         # Convert to date type
         self.df = self.df.withColumn("last_rated", to_date(col("last_rated")))
-
         pass
 
