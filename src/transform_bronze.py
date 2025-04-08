@@ -215,6 +215,7 @@ class MovieExtendedBronzeLayer(BronzeLayer):
         self.transform_genres()
         self.transform_production_companies()
         self.transform_production_countries()
+        self.transform_spoken_languages()
 
 
         print("After Process:")
@@ -291,11 +292,41 @@ class MovieExtendedBronzeLayer(BronzeLayer):
         self.df = self.df.drop("production_countries_struct")
 
         #Convert arrays to comma-separated strings
-        self.df = self.df.withColumn("production_countries_iso", expr("concat_ws(', ', production_countries_iso)"))
-        self.df = self.df.withColumn("production_countries", expr("concat_ws(', ', production_countries)"))
+        self.df = self.df.withColumn("production_countries_iso", expr("concat_ws(',', production_countries_iso)"))
+        self.df = self.df.withColumn("production_countries", expr("concat_ws(',', production_countries)"))
         pass
 
-    def transform_spoken_language(self):
+    def transform_spoken_languages(self):
+        """
+        Business Logic:
+        (1) Convert spoken_languages column to String type.
+        (2) Extract 'iso_639_1' key from the spoken_languages column into 'spoken_languages_iso' column.
+        (3) Extract 'name' key from the spoken_languages column into 'spoken_languages' column.
+        """
+        # Step 1: Ensure column is StringType
+        self.df = self.df.withColumn("spoken_languages", col("spoken_languages").cast(StringType()))
+
+        # Step 2: Define schema of the JSON array
+        language_schema = ArrayType(
+            StructType([
+                StructField("iso_639_1", StringType(), True),
+                StructField("name", StringType(), True)
+            ])
+        )
+
+        # Step 3: Parse JSON string into array of structs
+        self.df = self.df.withColumn("spoken_languages_struct", from_json(col("spoken_languages"), language_schema))
+
+        # Step 4: Extract the fields into separate columns
+        self.df = self.df.withColumn("spoken_languages_iso", col("spoken_languages_struct.iso_639_1"))
+        self.df = self.df.withColumn("spoken_languages", col("spoken_languages_struct.name"))
+
+        # Step 5: Drop intermediate struct column if not needed
+        self.df = self.df.drop("spoken_languages_struct")
+
+        #Convert arrays to comma-separated strings
+        self.df = self.df.withColumn("spoken_languages_iso", expr("concat_ws(',', spoken_languages_iso)"))
+        self.df = self.df.withColumn("spoken_languages", expr("concat_ws(',', spoken_languages)"))
         pass
 
 class RatingsBronzeLayer(BronzeLayer):
