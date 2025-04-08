@@ -33,7 +33,6 @@ class MovieBronzeLayer(BronzeLayer):
         DataQuality(self.df, self.name).data_quality()
         return None
 
-
     def test_transform_title(self):
         pass
 
@@ -62,7 +61,6 @@ class MovieBronzeLayer(BronzeLayer):
         self.row_based_transformation()
         print("*********************************after:**********************************")
         DataQuality(self.df, self.name).data_quality()
-
 
     def test_transform_id(self):
 
@@ -116,7 +114,6 @@ class MovieBronzeLayer(BronzeLayer):
         nullCountAfter = DataQuality(self.df, self.name).count_nulls_1col('revenue')
         print(f"Null count in revenue column: {nullCountAfter}")
 
-
     def row_based_transformation(self):
         """
         Business Logic:
@@ -144,7 +141,6 @@ class MovieBronzeLayer(BronzeLayer):
         #Convert movie_id to String type
         self.df = self.df.withColumn("id", self.df["id"].cast(StringType()))
         
-
     def transform_title(self):
         """
         Business Logic:
@@ -207,10 +203,45 @@ class MovieExtendedBronzeLayer(BronzeLayer):
     def __init__(self, df: DataFrame, name: str):
         super().__init__(df, name)
     
+    def transform_df(self):
+        """
+        This method applies the transformations to the DataFrame.
+        """
+        DataQuality(self.df, self.name).data_quality()
+
+
+        self.row_based_transformation()
+        self.transform_id()
+
+
+
+        print("After Process:")
+        DataQuality(self.df, self.name).data_quality()
+
+    def row_based_transformation(self):
+        """
+        Business Logic:
+        (1) remove duplicates and nulls based on movie_id column
+
+        """
+        #Remove duplicates and nulls from movie_id column
+        self.df = self.df.dropDuplicates(["id"])
+        self.df = self.df.filter(self.df["id"].isNotNull())
+        pass
+
     def transform_id(self):
+        """
+        Business Logic:
+        (1) 1-6 numeric character of movie_id are only accepted.
+        (2) Remove duplicates and nulls from movie_id column
+        (3) Convert movie_id to String type.
+        """
+        #Filter movie_id to only accept 1-6 numeric characters
+        self.df = self.df.filter(self.df["id"].rlike("^[0-9]{1,6}$"))
         pass
 
     def transform_genres(self):
+        
         pass
 
     def transform_production_companies(self):

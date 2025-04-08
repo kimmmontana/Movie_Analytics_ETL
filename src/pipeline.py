@@ -5,7 +5,9 @@ from transform_bronze import MovieBronzeLayer, MovieExtendedBronzeLayer, Ratings
 
 
 def run_pipeline():
-    #This is the main function that runs the ETL pipeline.
+    '''
+    This is the main function that runs the ETL pipeline.
+    '''
 
     #Initialization
     spark = SparkSession.builder.appName("Movie_Analytics_ETL").getOrCreate()
@@ -18,8 +20,11 @@ def run_pipeline():
     # for key in sourceDataframes.keys():
     #     DataQuality(sourceDataframes[key], key)
 
-    test1 = MovieBronzeLayer(sourceDataframes['movies'], 'movies')
-    test1.test_transform_df()
+    # test1 = MovieBronzeLayer(sourceDataframes['movies'], 'movies')
+    # test1.test_transform_df()
+
+    test2 = MovieExtendedBronzeLayer(sourceDataframes['extended'], 'extended')
+    test2.transform_df()
 
     # #Transformation to Bronze Layer
     # for key in sourceDataframes.keys():
