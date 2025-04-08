@@ -37,7 +37,7 @@ class DataExtractor:
         ratings_df = self.spark.read.json('../project_data/ratings_cleaned.json')
 
         ratings_df_cleaned = ratings_df.select(
-            "movie_id",
+            col("movie_id").alias("id"),
             "ratings_summary.avg_rating",
             "ratings_summary.total_ratings",
             "ratings_summary.std_dev",

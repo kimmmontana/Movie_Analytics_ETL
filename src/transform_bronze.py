@@ -1,6 +1,6 @@
 from pyspark.sql import DataFrame
-from pyspark.sql.types import StringType, IntegerType, DoubleType, ArrayType, StructType, StructField
-from pyspark.sql.functions import when, col, to_date, from_json, expr
+from pyspark.sql.types import StringType, IntegerType, DoubleType, ArrayType, StructType, StructField, LongType
+from pyspark.sql.functions import when, col, to_date, from_json, expr, from_unixtime
 from data_quality import DataQuality
 
 class BronzeLayer:
@@ -16,11 +16,20 @@ class MovieBronzeLayer(BronzeLayer):
         """
         This method applies the transformations to the DataFrame.
         """
-        self.transform_movie_id()
+        # Call the data quality check before transformation
+        DataQuality(self.df, self.name).data_quality()
+
+        self.row_based_transformation()
+        self.transform_id()
         self.transform_title()
         self.transform_release_date()
         self.transform_budget()
         self.transform_revenue()
+
+        # Call the data quality check after transformation
+        print("After Process:")
+        DataQuality(self.df, self.name).data_quality()
+        pass 
 
     def test_transform_df(self):
         """
@@ -124,7 +133,7 @@ class MovieBronzeLayer(BronzeLayer):
         self.df = self.df.dropDuplicates(["id"])
         self.df = self.df.filter(self.df["id"].isNotNull())
 
-    def transform_movie_id(self):
+    def transform_id(self):
         """,
         Business Logic:
         (1) 1-6 numeric character of movie_id are only accepted.
@@ -185,7 +194,6 @@ class MovieBronzeLayer(BronzeLayer):
         #convert 0 to Null
         self.df = self.df.withColumn("budget", when(col("budget") == "0", None).otherwise(col("budget")))
  
-
     def transform_revenue(self):
         """
         Business Logic:
@@ -334,18 +342,75 @@ class RatingsBronzeLayer(BronzeLayer):
         super().__init__(df, name)
         pass
 
-    def transform_movie_id(self):
+    def transform_df(self):
+        """
+        This method applies the transformations to the DataFrame.
+        """
+        # Call the data quality check before transformation
+        DataQuality(self.df, self.name).data_quality()
+
+        # Call the transformation methods in the order they should be applied
+        self.transform_id()
+        self.transform_avg_rating()
+        self.transform_total_ratings()
+        self.transform_total_std_dev()
+        self.transform_last_rated()
+
+        # Call the data quality check after transformation
+        print("After Process:") 
+        DataQuality(self.df, self.name).data_quality()
+
+    def transform_id(self):
+        """
+        Business Logic:
+        (1) 1-6 numeric character of movie_id are only accepted.
+        (3) Convert id to String type.
+        """
+        # Filter movie_id to only accept 1-6 numeric characters
+        self.df = self.df.filter(self.df["id"].rlike("^[0-9]{1,6}$"))
+
+        #convert id to String type
+        self.df = self.df.withColumn("id", self.df["id"].cast(StringType()))
         pass
 
     def transform_avg_rating(self):
+        """
+        Business Logic:
+        (1) cast to double type
+        """
+        # cast to double type
+        self.df = self.df.withColumn("avg_rating", self.df["avg_rating"].cast(DoubleType()))
         pass
 
     def transform_total_ratings(self):
+        """
+        Business Logic:
+        (1) cast to integer type
+        """
+        # cast to integer type
+        self.df = self.df.withColumn("total_ratings", self.df["total_ratings"].cast(IntegerType()))
         pass
 
     def transform_total_std_dev(self):
+        """
+        Business Logic:
+        (1) cast to double type
+        """
+        # cast to double type
+        self.df = self.df.withColumn("std_dev", self.df["std_dev"].cast(DoubleType()))
         pass
 
     def transform_last_rated(self):
+        """
+        Business Logic:
+        (1) Convert Unix timestamp to readable datetime
+        (2) Convert datetime to date (yyyy-MM-dd)
+        """
+        # Convert Unix timestamp (seconds) to timestamp string
+        self.df = self.df.withColumn("last_rated", from_unixtime(col("last_rated")))
+
+        # Convert to date type
+        self.df = self.df.withColumn("last_rated", to_date(col("last_rated")))
+
         pass
 

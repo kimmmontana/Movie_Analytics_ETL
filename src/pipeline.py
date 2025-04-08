@@ -2,7 +2,7 @@ from pyspark.sql import SparkSession
 from extract import DataExtractor
 from data_quality import DataQuality
 from transform_bronze import MovieBronzeLayer, MovieExtendedBronzeLayer, RatingsBronzeLayer
-
+#from transform_silver import MovieSilverLayer, MovieExtendedSilverLayer, RatingsSilverLayer
 
 def run_pipeline():
     '''
@@ -20,22 +20,40 @@ def run_pipeline():
     # for key in sourceDataframes.keys():
     #     DataQuality(sourceDataframes[key], key)
 
-    # test1 = MovieBronzeLayer(sourceDataframes['movies'], 'movies')
-    # test1.test_transform_df()
+    # bronzeMovieDf = MovieBronzeLayer(sourceDataframes['movies'], 'movies')
+    # bronzeMovieDf.transform_df()
 
-    test2 = MovieExtendedBronzeLayer(sourceDataframes['extended'], 'extended')
-    test2.transform_df()
+    # bronzeMovieExtendedDf = MovieExtendedBronzeLayer(sourceDataframes['extended'], 'extended')
+    # bronzeMovieExtendedDf.transform_df()
 
-    # #Transformation to Bronze Layer
-    # for key in sourceDataframes.keys():
-    #     if key.lower() == "movies":
-    #         MovieBronzeLayer(sourceDataframes[key], key)
-    #     elif key.lower() == "extended":
-    #         MovieExtendedBronzeLayer(sourceDataframes[key], key)
-    #     elif key.lower() == "ratings":
-    #         RatingsBronzeLayer(sourceDataframes[key], key)
-    #     else:
-    #         raise ValueError(f"No BronzeLayer defined for source: {key}")
+    bronzeRatingsDF = RatingsBronzeLayer(sourceDataframes['ratings'], 'ratings')
+    bronzeRatingsDF.transform_df()
+
+    #Silver Layer
+    # bronzeMovieDf = MovieBronzeLayer(sourceDataframes['movies'], 'movies')
+    # bronzeMovieDf.transform_df()
+    # bronzeMovieExtendedDf = MovieExtendedBronzeLayer(sourceDataframes['extended'], 'extended')
+    # bronzeMovieExtendedDf.transform_df()
+    # bronzeRatingsDF = RatingsBronzeLayer(sourceDataframes['ratings'], 'ratings')
+    # bronzeRatingsDF.transform_df()
+
+    # #Data Quality Check of Bronze Dataframes
+    # for key in sourceDataframes.keys():   
+    #     DataQuality(sourceDataframes[key], key)
+    #     DataQuality(bronzeMovieDf, 'movies')
+    #     DataQuality(bronzeMovieExtendedDf, 'extended')
+    #     DataQuality(bronzeRatingsDF, 'ratings')
+    #     DataQuality(bronzeMovieExtendedDf, 'extended')
+    #     DataQuality(bronzeRatingsDF, 'ratings')
+    #     DataQuality(bronzeRatingsDF, 'ratings')
+    #     DataQuality(bronzeMovieExtendedDf, 'extended')
+    #     DataQuality(bronzeRatingsDF, 'ratings')
+    #     DataQuality(bronzeMovieExtendedDf, 'extended')
+    #     DataQuality(bronzeRatingsDF, 'ratings')
+    #     DataQuality(bronzeMovieExtendedDf, 'extended')
+    #     DataQuality(bronzeRatingsDF, 'ratings')
+    #     DataQuality(bronzeMovieExtendedDf, 'extended')
+    #     DataQuality(bronzeRatingsDF, 'ratings')
 
     spark.stop()
 
