@@ -1,6 +1,6 @@
 from pyspark.sql import DataFrame
-from pyspark.sql.types import StringType, IntegerType, DoubleType
-from pyspark.sql.functions import when, col, to_date
+from pyspark.sql.types import StringType, IntegerType, DoubleType, ArrayType, StructType, StructField
+from pyspark.sql.functions import when, col, to_date, from_json, expr
 from data_quality import DataQuality
 
 class BronzeLayer:
@@ -209,10 +209,12 @@ class MovieExtendedBronzeLayer(BronzeLayer):
         """
         DataQuality(self.df, self.name).data_quality()
 
-
+        #Call the transformation methods in the order they should be applied
         self.row_based_transformation()
         self.transform_id()
-
+        self.transform_genres()
+        self.transform_production_companies()
+        self.transform_production_countries()
 
 
         print("After Process:")
@@ -241,13 +243,56 @@ class MovieExtendedBronzeLayer(BronzeLayer):
         pass
 
     def transform_genres(self):
-        
+        """
+        Business Logic:
+        (1) Convert genres to String type.
+        (2) Duplicates are already removed by row_based_transformations
+        """
+        #Convert genres to String type
+        self.df = self.df.withColumn("genres", self.df["genres"].cast(StringType()))
         pass
 
     def transform_production_companies(self):
+        """
+        Business Logic:
+        (1) Convert production_companies to String type.
+        """
+
+        #Convert production_companies to String type
+        self.df = self.df.withColumn("production_companies", self.df["production_companies"].cast(StringType()))
         pass
 
     def transform_production_countries(self):
+        """
+        Business Logic:
+        (1) Convert production_countries column to String type.
+        (2) Extract 'iso_3166_1' key from the production_countries column into 'production_countries_iso' column.
+        (3) Extract 'name' key from the production_countries column into 'production_countries' column.
+        """
+        # Step 1: Ensure column is StringType
+        self.df = self.df.withColumn("production_countries", col("production_countries").cast(StringType()))
+
+        # Step 2: Define schema of the JSON array
+        country_schema = ArrayType(
+            StructType([
+                StructField("iso_3166_1", StringType(), True),
+                StructField("name", StringType(), True)
+            ])
+        )
+
+        # Step 3: Parse JSON string into array of structs
+        self.df = self.df.withColumn("production_countries_struct", from_json(col("production_countries"), country_schema))
+
+        # Step 4: Extract the fields into separate columns
+        self.df = self.df.withColumn("production_countries_iso", col("production_countries_struct.iso_3166_1"))
+        self.df = self.df.withColumn("production_countries", col("production_countries_struct.name"))
+
+        # Step 5: Drop intermediate struct column if not needed
+        self.df = self.df.drop("production_countries_struct")
+
+        #Convert arrays to comma-separated strings
+        self.df = self.df.withColumn("production_countries_iso", expr("concat_ws(', ', production_countries_iso)"))
+        self.df = self.df.withColumn("production_countries", expr("concat_ws(', ', production_countries)"))
         pass
 
     def transform_spoken_language(self):
