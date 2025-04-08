@@ -29,7 +29,7 @@ def run_pipeline():
     bronzeRatingsDF = RatingsBronzeLayer(sourceDataframes['ratings'], 'ratings')
     bronzeRatingsDF.transform_df()
 
-    SilverLayer(bronzeMovieDf.bronzeMovieDF, bronzeMovieExtendedDf.bronzeMovieExtendedDf, bronzeRatingsDF.bronzeRatingsDF).fact_movies()
+    SilverLayer(bronzeMovieDf.bronzeMovieDF, bronzeMovieExtendedDf.bronzeMovieExtendedDf, bronzeRatingsDF.bronzeRatingsDF).dim_movies_genres()
     
     #Silver Layer
     # bronzeMovieDf = MovieBronzeLayer(sourceDataframes['movies'], 'movies')
@@ -39,23 +39,7 @@ def run_pipeline():
     # bronzeRatingsDF = RatingsBronzeLayer(sourceDataframes['ratings'], 'ratings')
     # bronzeRatingsDF.transform_df()
 
-    # #Data Quality Check of Bronze Dataframes
-    # for key in sourceDataframes.keys():   
-    #     DataQuality(sourceDataframes[key], key)
-    #     DataQuality(bronzeMovieDf, 'movies')
-    #     DataQuality(bronzeMovieExtendedDf, 'extended')
-    #     DataQuality(bronzeRatingsDF, 'ratings')
-    #     DataQuality(bronzeMovieExtendedDf, 'extended')
-    #     DataQuality(bronzeRatingsDF, 'ratings')
-    #     DataQuality(bronzeRatingsDF, 'ratings')
-    #     DataQuality(bronzeMovieExtendedDf, 'extended')
-    #     DataQuality(bronzeRatingsDF, 'ratings')
-    #     DataQuality(bronzeMovieExtendedDf, 'extended')
-    #     DataQuality(bronzeRatingsDF, 'ratings')
-    #     DataQuality(bronzeMovieExtendedDf, 'extended')
-    #     DataQuality(bronzeRatingsDF, 'ratings')
-    #     DataQuality(bronzeMovieExtendedDf, 'extended')
-    #     DataQuality(bronzeRatingsDF, 'ratings')
+
 
     spark.stop()
 
