@@ -20,17 +20,18 @@ def run_pipeline():
     # for key in sourceDataframes.keys():
     #     DataQuality(sourceDataframes[key], key)
 
-    bronzeMovieDf = MovieBronzeLayer(sourceDataframes['movies'], 'movies')
-    bronzeMovieDf.transform_df()
+    bronzeMovieDF = MovieBronzeLayer(sourceDataframes['movies'], 'movies')
+    bronzeMovieDF.transform_df()
 
-    bronzeMovieExtendedDf = MovieExtendedBronzeLayer(sourceDataframes['extended'], 'extended')
-    bronzeMovieExtendedDf.transform_df()
+    bronzeMovieExtendedDF = MovieExtendedBronzeLayer(sourceDataframes['extended'], 'extended')
+    bronzeMovieExtendedDF.transform_df()
+    DataQuality(bronzeMovieExtendedDF.bronzeMovieExtendedDF, 'extended').data_quality()
 
     bronzeRatingsDF = RatingsBronzeLayer(sourceDataframes['ratings'], 'ratings')
     bronzeRatingsDF.transform_df()
 
-    SilverLayer(bronzeMovieDf.bronzeMovieDF, bronzeMovieExtendedDf.bronzeMovieExtendedDf, bronzeRatingsDF.bronzeRatingsDF).dim_movies_genres()
-    
+    SilverLayer(bronzeMovieDF.bronzeMovieDF, bronzeMovieExtendedDF.bronzeMovieExtendedDF, bronzeRatingsDF.bronzeRatingsDF).dim_movies_languages()
+
     #Silver Layer
     # bronzeMovieDf = MovieBronzeLayer(sourceDataframes['movies'], 'movies')
     # bronzeMovieDf.transform_df()

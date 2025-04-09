@@ -212,7 +212,7 @@ class MovieBronzeLayer(BronzeLayer):
 class MovieExtendedBronzeLayer(BronzeLayer):
     def __init__(self, df: DataFrame, name: str):
         super().__init__(df, name)
-        self.bronzeMovieExtendedDf = None
+        self.bronzeMovieExtendedDF = None
 
     def transform_df(self):
         """
@@ -228,7 +228,7 @@ class MovieExtendedBronzeLayer(BronzeLayer):
         self.transform_production_countries()
         self.transform_spoken_languages()
 
-        self.bronzeMovieExtendedDf = self.df
+        self.bronzeMovieExtendedDF = self.df
 
         print("After Process:")
         #DataQuality(self.df, self.name).data_quality()
@@ -277,68 +277,15 @@ class MovieExtendedBronzeLayer(BronzeLayer):
 
     def transform_production_countries(self):
         """
-        Business Logic:
-        (1) Convert production_countries column to String type.
-        (2) Extract 'iso_3166_1' key from the production_countries column into 'production_countries_iso' column.
-        (3) Extract 'name' key from the production_countries column into 'production_countries' column.
+        Transformation is in Silver Layer
         """
-        # Step 1: Ensure column is StringType
-        self.df = self.df.withColumn("production_countries", col("production_countries").cast(StringType()))
-
-        # Step 2: Define schema of the JSON array
-        country_schema = ArrayType(
-            StructType([
-                StructField("iso_3166_1", StringType(), True),
-                StructField("name", StringType(), True)
-            ])
-        )
-
-        # Step 3: Parse JSON string into array of structs
-        self.df = self.df.withColumn("production_countries_struct", from_json(col("production_countries"), country_schema))
-
-        # Step 4: Extract the fields into separate columns
-        self.df = self.df.withColumn("production_countries_iso", col("production_countries_struct.iso_3166_1"))
-        self.df = self.df.withColumn("production_countries", col("production_countries_struct.name"))
-
-        # Step 5: Drop intermediate struct column if not needed
-        self.df = self.df.drop("production_countries_struct")
-
-        #Convert arrays to comma-separated strings
-        self.df = self.df.withColumn("production_countries_iso", expr("concat_ws(',', production_countries_iso)"))
-        self.df = self.df.withColumn("production_countries", expr("concat_ws(',', production_countries)"))
         pass
 
     def transform_spoken_languages(self):
         """
-        Business Logic:
-        (1) Convert spoken_languages column to String type.
-        (2) Extract 'iso_639_1' key from the spoken_languages column into 'spoken_languages_iso' column.
-        (3) Extract 'name' key from the spoken_languages column into 'spoken_languages' column.
+        Transformation is in Silver Layer
         """
-        # Step 1: Ensure column is StringType
-        self.df = self.df.withColumn("spoken_languages", col("spoken_languages").cast(StringType()))
 
-        # Step 2: Define schema of the JSON array
-        language_schema = ArrayType(
-            StructType([
-                StructField("iso_639_1", StringType(), True),
-                StructField("name", StringType(), True)
-            ])
-        )
-
-        # Step 3: Parse JSON string into array of structs
-        self.df = self.df.withColumn("spoken_languages_struct", from_json(col("spoken_languages"), language_schema))
-
-        # Step 4: Extract the fields into separate columns
-        self.df = self.df.withColumn("spoken_languages_iso", col("spoken_languages_struct.iso_639_1"))
-        self.df = self.df.withColumn("spoken_languages", col("spoken_languages_struct.name"))
-
-        # Step 5: Drop intermediate struct column if not needed
-        self.df = self.df.drop("spoken_languages_struct")
-
-        #Convert arrays to comma-separated strings
-        self.df = self.df.withColumn("spoken_languages_iso", expr("concat_ws(',', spoken_languages_iso)"))
-        self.df = self.df.withColumn("spoken_languages", expr("concat_ws(',', spoken_languages)"))
         pass
 
 class RatingsBronzeLayer(BronzeLayer):
