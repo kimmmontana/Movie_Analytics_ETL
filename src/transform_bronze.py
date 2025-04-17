@@ -348,9 +348,13 @@ class RatingsBronzeLayer(BronzeLayer):
         """
         Business Logic:
         (1) cast to double type
+        (2) Convert NaN to Null
         """
+        # Convert NaN to Null
+        self.df = self.df.withColumn("std_dev", when(col("std_dev") == "NaN", None).otherwise(col("std_dev")))
         # cast to double type
         self.df = self.df.withColumn("std_dev", self.df["std_dev"].cast(DoubleType()))
+
         pass
 
     def transform_last_rated(self):

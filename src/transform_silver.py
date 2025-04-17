@@ -17,7 +17,25 @@ class SilverLayer:
         self.dimMoviesLanguagesDF = None
         self.dimMoviesCountriesDF = None
         self.dimMoviesCompaniesDF = None
+
+    def get_all_dataframes(self):
         
+        self.fact_movies()
+        self.dim_movies()
+        self.dim_movies_genres()
+        self.dim_movies_languages()
+        self.dim_movies_countries()
+        self.dim_movies_companies()
+        
+        return {
+            "factMovies": self.factMoviesDF,
+            "dimMovies": self.dimMoviesDF,
+            "dimMoviesGenres": self.dimMoviesGenresDF,
+            "dimMoviesLanguages": self.dimMoviesLanguagesDF,
+            "dimMoviesCountries": self.dimMoviesCountriesDF,
+            "dimMoviesCompanies": self.dimMoviesCompaniesDF
+        }    
+    
     def fact_movies(self):
        """
        Business Logic:
@@ -40,7 +58,7 @@ class SilverLayer:
         .join(self.bronzeRatingsDF.alias('ratings'), col('movie.id') == col('ratings.id'), "left")
        
        self.factMoviesDF = self.factMoviesDF.select(
-           col("movie.id").alias("movie_id"),
+           col("movie.id").alias("id"),
            col("release_date"),
            col("budget"),
            col("revenue"),
@@ -75,7 +93,7 @@ class SilverLayer:
             .join(self.bronzeRatingsDF.alias('ratings'), col('movie.id') == col('ratings.id'), "left")
         
         self.dimMoviesDF = self.dimMoviesDF.select(
-            col("movie.id").alias("movie_id"),
+            col("movie.id").alias("id"),
             col("title"),
             col("release_date"),
             col("last_rated")
@@ -88,24 +106,21 @@ class SilverLayer:
         """
         Business Logic:
         Tables needed for the dim table:
-        (1) bronzeMovieDF : movies
-        (2) bronzeMovieExtendedDF : extended
+        (1) bronzeMovieExtendedDF : extended
 
         The following columns are needed in the dim table:
-        (1) movie_id : bronzeMovieDF.id
-        (2) genres : bronzeMovieDF.genres
+        (1) movie_id : bronzeMovieExtendedDF.id
+        (2) genres : bronzeMovieExtendedDF.genres
         """
-        # Join the bronzeMovieDF with bronzeMovieExtendedDF on the 'id' column
-        self.dimMoviesGenresDF = self.bronzeMovieDF.alias('movie') \
-            .join(self.bronzeMovieExtendedDf.alias('extended'), col('movie.id') == col('extended.id'), "left")
+
 
         # Split the 'genres' column by commas to convert it into an array, then explode it
-        self.dimMoviesGenresDF = self.dimMoviesGenresDF.withColumn(
+        self.dimMoviesGenresDF = self.bronzeMovieExtendedDf.withColumn(
             "genres_array", split(col("genres"), ",")  # Split genres by comma
         ).withColumn(
             "genre", explode(col("genres_array"))  # Explode the array into individual rows
         ).select(
-            col("movie.id").alias("id"),
+            col("id"),
             col("genre")  # Select the exploded genre
         )
 
@@ -117,24 +132,20 @@ class SilverLayer:
         Business Logic
 
         Tables needed for the dim table:
-        (1) bronzeMovieDF : movies
-        (2) bronzeMovieExtendedDF : extended
+        (1) bronzeMovieExtendedDF : extended
 
         The following columns are needed in the dim table:
-        (1) movie_id : bronzeMovieDF.id
+        (1) movie_id : bronzeMovieExtendedDF.id
         (2) companies : bronzeMovieExtendedDF.production_companies
         """
-        # Join the bronzeMovieDF with bronzeMovieExtendedDF on the 'id' column
-        self.dimMoviesCompaniesDF = self.bronzeMovieDF.alias('movie') \
-            .join(self.bronzeMovieExtendedDf.alias('extended'), col('movie.id') == col('extended.id'), "left")
         
         # Split the 'production_companies' column by commas to convert it into an array, then explode it
-        self.dimMoviesCompaniesDF = self.dimMoviesCompaniesDF.withColumn(
+        self.dimMoviesCompaniesDF = self.bronzeMovieExtendedDf.withColumn(
             "companies_array", split(col("production_companies"), ",")  # Split companies by comma
         ).withColumn(
             "company", explode(col("companies_array"))  # Explode the array into individual rows
         ).select(
-            col("movie.id").alias("id"),
+            col("id"),
             col("company")  # Select the exploded company
         )
 
