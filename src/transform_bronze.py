@@ -18,7 +18,7 @@ class MovieBronzeLayer(BronzeLayer):
         This method applies the transformations to the DataFrame.
         """
         # Call the data quality check before transformation
-        #DataQuality(self.df, self.name).data_quality()
+        DataQuality(self.df, self.name).data_quality()
 
         self.row_based_transformation()
         self.transform_id()
@@ -29,7 +29,7 @@ class MovieBronzeLayer(BronzeLayer):
 
         self.bronzeMovieDF = self.df
         # Call the data quality check after transformation
-        print("After Process:")
+        print("Movie.csv transformed under bronze layer..")
         #DataQuality(self.df, self.name).data_quality()
         pass 
 
@@ -230,7 +230,7 @@ class MovieExtendedBronzeLayer(BronzeLayer):
 
         self.bronzeMovieExtendedDF = self.df
 
-        print("After Process:")
+        print("MovieExtended Transformed under bronze layer..")
         #DataQuality(self.df, self.name).data_quality()
 
     def row_based_transformation(self):
@@ -310,7 +310,7 @@ class RatingsBronzeLayer(BronzeLayer):
 
         self.bronzeRatingsDF = self.df
         # Call the data quality check after transformation
-        #print("After Process:") 
+        print("Ratings transformed under bronze layer..") 
         #DataQuality(self.df, self.name).data_quality()
 
     def transform_id(self):
